@@ -7,4 +7,14 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Folder Include="Document\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="FileIO">
+      <HintPath>..\FileIO-main\FileIO\bin\Debug\net8.0\FileIO.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>
