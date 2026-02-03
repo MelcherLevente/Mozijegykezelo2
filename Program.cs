@@ -1,19 +1,22 @@
 ﻿using Mozijegykezelo1.Document;
 using Mozijegykezelo1.Model;
 using System.Data;
+using System.Reflection.Metadata.Ecma335;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 
 internal class Program
 {
     public static FileIO.ReadFromFile reader = new FileIO.ReadFromFile();
+    public static FileIO.WriteToFile writer = new FileIO.WriteToFile();
     public static List<List<string>> jegyAdatok = new();
     public static List<Jegy> jegyek;
 
     public static readonly string connectionString = "Server=localhost;Database=mozi;User=root;";
-    string query = "SELECT DISTINCT varos FROM diakok";
     public static DataTable filmAdatok = new DataTable();
     public static List<Film> filmLista = new List<Film>();
     public static List<string> kategoriak = new List<string>();
+    
     static void Main(string[] args)
     {
         //Console.ForegroundColor = ConsoleColor.Yellow;
@@ -21,61 +24,258 @@ internal class Program
         //Console.Clear();
         JegyBeolvasas(ref jegyAdatok);
         JegyFeltoltes(jegyAdatok);
-        Kiiras(jegyek);
+        //Kiiras(jegyek);
 
         //DBCheck(connectionString);
         SelectFromTable("filmek", connectionString);
         FilmFeltoltes(filmAdatok);
-        PrintDataTable(filmAdatok);
+        //PrintDataTable(filmAdatok);
+
         KategoriaLista(kategoriak);
-        FilmAjanlas(filmAdatok);
-        Top5(filmAdatok);
+        Jegyvasarlas(jegyek);
+        
+        //Top5(filmAdatok);
 
     }
+
+    private static string KategoriaValasztas()
+    {
+        Console.WriteLine("Milyen stílusú filmet keresel?");
+        foreach (var k in kategoriak)
+        {
+            Console.WriteLine($"\t{k}");
+        }
+
+        Console.WriteLine($"Választott kategória: ");
+        string valasztottKategoria = Console.ReadLine();
+
+        while (!kategoriak.Contains(valasztottKategoria))
+        {
+            Console.WriteLine("Ilyen kategória nem létezik!");
+            Console.WriteLine("Milyen stílusú filmet keresel?");
+            valasztottKategoria = Console.ReadLine();
+        }
+        return valasztottKategoria;
+    }
+
+    private static void Jegyvasarlas(List<Jegy> jegyek)
+    {
+        string kivalasztottFilm;
+        while (true)
+        {
+            string valasztottKategoria = KategoriaValasztas();
+
+            List<int> sorszamokFilm = new List<int>();
+            List<string> valaszthatoFilmek = new List<string>();
+            int sorszamFilm = 1;
+
+            Console.WriteLine("Ezek a filmek elérhetőek a választott kategóriában:");
+
+            foreach (var f in filmLista)
+            {
+                if (f.Kategoria == valasztottKategoria)
+                {
+                    Console.WriteLine($"{sorszamFilm}.\t {f.Cim} ({f.MegjelenesEve}) - {f.Rendezo}");
+                    valaszthatoFilmek.Add(f.Cim);
+                    sorszamokFilm.Add(sorszamFilm);
+                    sorszamFilm++;
+                }
+            }
+
+            Console.WriteLine("Add meg a film sorszámát, amit nézni szeretnél, ha másik kategóriát választanál üss 0-ást:");
+            int valasztottSorszamFilm = int.Parse(Console.ReadLine());
+
+            if (valasztottSorszamFilm == 0)
+            {
+                continue;
+            }
+
+            while (!sorszamokFilm.Contains(valasztottSorszamFilm))
+            {
+                Console.WriteLine("Nincs ilyen sorszámú film a választott kategóriában!");
+                Console.WriteLine("Add meg újra (0 = vissza):");
+                valasztottSorszamFilm = int.Parse(Console.ReadLine());
+
+                if (valasztottSorszamFilm == 0)
+                {
+                    Console.Clear();
+                    break;
+                }
+            }
+
+            if (valasztottSorszamFilm == 0)
+            {
+                continue;
+            }
+            kivalasztottFilm = valaszthatoFilmek[valasztottSorszamFilm - 1];
+            Console.WriteLine($"A választott film: {kivalasztottFilm}");
+            break;
+        }
+
+        Console.WriteLine("A jegyvásárláshoz add meg a neved:");
+        string vevoNev = Console.ReadLine();
+
+        List<string> vetitesek = new List<string>();
+        foreach(var j in jegyek)
+        {
+            if (j.FilmCim == kivalasztottFilm)
+            {
+                if (!vetitesek.Contains(j.VetitesIdopont))
+                {
+                    vetitesek.Add(j.VetitesIdopont);
+                }
+            }
+        }
+
+        List<int> sorszamokVetites = new List<int>();
+        List<string> valaszthatoVetitesek = new List<string>();
+        int sorszamVetites = 1;
+
+        Console.WriteLine($"Ezek a vetítési időpontok elérhetőek:");
+
+        foreach (var f in jegyek)
+        {
+            if (f.FilmCim == kivalasztottFilm && !valaszthatoVetitesek.Contains(f.VetitesIdopont))
+            {
+                Console.WriteLine($"{sorszamVetites}.\t {f.VetitesIdopont}");
+                valaszthatoVetitesek.Add(f.VetitesIdopont);
+                sorszamokVetites.Add(sorszamVetites);
+                sorszamVetites++;
+            }
+        }
+
+        int valasztottSorszamVetites;
+        Console.WriteLine("Melyik sorszámú vetítés felel meg?");
+        while (true)
+        {
+            valasztottSorszamVetites = int.Parse(Console.ReadLine());
+            if (sorszamokVetites.Contains(valasztottSorszamVetites))
+            {
+                break;
+            }
+            Console.WriteLine("Nincs ilyen sorszámú vetítés! Add meg újra:");
+        }
+
+        string kivalasztottVetites = valaszthatoVetitesek[valasztottSorszamVetites - 1];
+        Console.WriteLine($"A választott vetítés időpontja: {kivalasztottVetites}");
+
+
+        string[] valaszthatoSorok = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
+        int[] szekek = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20];
+        List<int> valaszthatoSzekek = new List<int>();
+        string valasztottSor = "";
+        int valasztottSzek = 0;
+        Console.WriteLine("Válaszd ki a széked:");
+        foreach (var j in jegyek)
+        {
+            if (j.FilmCim == kivalasztottFilm && j.VetitesIdopont == kivalasztottVetites)
+            {
+                while(!valaszthatoSorok.Contains(valasztottSor))
+                {
+                    Console.WriteLine("Választható sorok:");
+                    foreach (var sor in valaszthatoSorok)
+                    {
+                        Console.WriteLine($"\t{sor}");
+                    }
+                    Console.WriteLine();
+                    Console.WriteLine("Választott sor:");
+                    valasztottSor = Console.ReadLine();
+                    break;
+                }
+                break;
+            }
+        }
+
+        Console.WriteLine("Választható székek:");
+
+        foreach (var szek in szekek)
+        {
+            bool foglalt = false;
+
+            foreach (var j in jegyek)
+            {
+                if (j.FilmCim == kivalasztottFilm &&
+                    j.VetitesIdopont == kivalasztottVetites &&
+                    j.SzekSor == valasztottSor &&
+                    j.SzekSzam == szek)
+                {
+                    foglalt = true;
+                    break;
+                }
+            }
+
+            if (!foglalt)
+            {
+                valaszthatoSzekek.Add(szek);
+            }
+        }
+
+
+        do
+        {
+            Console.WriteLine("Választható székek:");
+            foreach (var szek in valaszthatoSzekek)
+                Console.WriteLine($"\t{szek}");
+
+            Console.Write("Választott szék: ");
+        }
+        while (!int.TryParse(Console.ReadLine(), out valasztottSzek)
+               || !valaszthatoSzekek.Contains(valasztottSzek));
+
+        // CSV-be írás
+        string fajlNev = "jegyek.csv";
+        bool letezik = File.Exists(fajlNev);
+
+        bool endsWithNewline = true;
+
+        if (letezik && new FileInfo(fajlNev).Length > 0)
+        {
+            using (FileStream fs = new FileStream(fajlNev, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+            {
+                fs.Seek(-1, SeekOrigin.End);
+                int lastByte = fs.ReadByte();
+                endsWithNewline = lastByte == '\n' || lastByte == '\r';
+            }
+        }
+
+        using (StreamWriter sw = new StreamWriter(fajlNev, append: true))
+        {
+            if (!endsWithNewline)
+                sw.WriteLine(); // ensures newline before appending
+
+            sw.WriteLine($"{vevoNev},{kivalasztottFilm},{kivalasztottVetites},{valasztottSor},{valasztottSzek}");
+
+        }
+
+
+
+
+        Console.WriteLine("Jegyed sikeresen megvásárolva! Jó szórakozást!");
+    }
+
 
     private static void Top5(DataTable filmAdatok)
     {
         //Console.WriteLine("Ezek a top 5 filmek:");
         //foreach(var j in jegyek)
         //{
-        //    if(j.FilmCim.)
+        //    if ()
+        //    {
+
+        //    }
         //}
     }
 
-    private static void FilmAjanlas(DataTable filmAdatok)
-    {
-        Console.WriteLine();
-        Console.WriteLine("Üdvözlünk a moziban!\nMilyen filmet szeretnél nézni ma?");
-        string valasztottKat = Console.ReadLine();
-        foreach (var v in kategoriak)
-        {
-            if (valasztottKat == v)
-            {
-                Console.WriteLine("Ezek a filmek elérhetőek:");
-                Console.WriteLine(filmLista);
-            }
-            else if(valasztottKat != v)
-            {
-                
-                Console.WriteLine("Ilyen kategória nem létezik!");
-                Console.WriteLine("Milyen filmet szeretnél nézni ma?");
-                valasztottKat =Console.ReadLine();
-            }
-            
-        }
-
-    }
+    
 
     private static void KategoriaLista(List<string> kategoriak)
     {
-        var egyediErtekek = filmAdatok.AsEnumerable()
-                          .Select(row => row.Field<string>("filmkategoria"))
-                          .Distinct()
-                          .ToList();
-        foreach (var k in egyediErtekek)
+        foreach (var f in filmLista)
         {
-            kategoriak.Add(k);
-            //Console.WriteLine(k);
+            if (!kategoriak.Contains(f.Kategoria))
+            {
+                kategoriak.Add(f.Kategoria);
+            }
         }
     }
 
@@ -148,7 +348,7 @@ internal class Program
     private static void SelectFromTable(string tableName, string connectionString)
     {
         filmAdatok = DatabaseService.GetAllData(tableName, connectionString);
-        Console.WriteLine("Adatok sikeresen szinkronizálva az adatbázisból, átmeneti tárolóba");
+        //Console.WriteLine("Adatok sikeresen szinkronizálva az adatbázisból, átmeneti tárolóba");
     }
 
     private static void DBCheck(string connectionString)
