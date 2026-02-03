@@ -13,7 +13,7 @@
 
   <ItemGroup>
     <Reference Include="FileIO">
-      <HintPath>H:\12\12aszaf\vs\FileIO.dll</HintPath>
+      <HintPath>H:\12.D\aszaf\FileIO\FileIO.dll</HintPath>
     </Reference>
   </ItemGroup>
 

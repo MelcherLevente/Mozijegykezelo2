@@ -2,6 +2,7 @@
 using Mozijegykezelo1.Model;
 using System.Data;
 
+
 internal class Program
 {
     public static FileIO.ReadFromFile reader = new FileIO.ReadFromFile();
@@ -9,10 +10,15 @@ internal class Program
     public static List<Jegy> jegyek;
 
     public static readonly string connectionString = "Server=localhost;Database=mozi;User=root;";
+    string query = "SELECT DISTINCT varos FROM diakok";
     public static DataTable filmAdatok = new DataTable();
     public static List<Film> filmLista = new List<Film>();
+    public static List<string> kategoriak = new List<string>();
     static void Main(string[] args)
     {
+        //Console.ForegroundColor = ConsoleColor.Yellow;
+        //Console.BackgroundColor = ConsoleColor.DarkMagenta;
+        //Console.Clear();
         JegyBeolvasas(ref jegyAdatok);
         JegyFeltoltes(jegyAdatok);
         Kiiras(jegyek);
@@ -21,8 +27,56 @@ internal class Program
         SelectFromTable("filmek", connectionString);
         FilmFeltoltes(filmAdatok);
         PrintDataTable(filmAdatok);
+        KategoriaLista(kategoriak);
+        FilmAjanlas(filmAdatok);
+        Top5(filmAdatok);
 
+    }
 
+    private static void Top5(DataTable filmAdatok)
+    {
+        //Console.WriteLine("Ezek a top 5 filmek:");
+        //foreach(var j in jegyek)
+        //{
+        //    if(j.FilmCim.)
+        //}
+    }
+
+    private static void FilmAjanlas(DataTable filmAdatok)
+    {
+        Console.WriteLine();
+        Console.WriteLine("Üdvözlünk a moziban!\nMilyen filmet szeretnél nézni ma?");
+        string valasztottKat = Console.ReadLine();
+        foreach (var v in kategoriak)
+        {
+            if (valasztottKat == v)
+            {
+                Console.WriteLine("Ezek a filmek elérhetőek:");
+                Console.WriteLine(filmLista);
+            }
+            else if(valasztottKat != v)
+            {
+                
+                Console.WriteLine("Ilyen kategória nem létezik!");
+                Console.WriteLine("Milyen filmet szeretnél nézni ma?");
+                valasztottKat =Console.ReadLine();
+            }
+            
+        }
+
+    }
+
+    private static void KategoriaLista(List<string> kategoriak)
+    {
+        var egyediErtekek = filmAdatok.AsEnumerable()
+                          .Select(row => row.Field<string>("filmkategoria"))
+                          .Distinct()
+                          .ToList();
+        foreach (var k in egyediErtekek)
+        {
+            kategoriak.Add(k);
+            //Console.WriteLine(k);
+        }
     }
 
     private static void PrintDataTable(DataTable filmLista)

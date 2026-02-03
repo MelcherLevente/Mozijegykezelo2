@@ -8,6 +8,7 @@ namespace Mozijegykezelo1.Model
 {
     internal class Film
     {
+
         public Film(int id, string cim, string kategoria, string rendezo, int megjelenesEve, int hossz)
         {
             Id = id;
