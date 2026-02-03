@@ -33,9 +33,48 @@ internal class Program
 
         KategoriaLista(kategoriak);
         Jegyvasarlas(jegyek);
-        
+
+
         //Top5(filmAdatok);
 
+
+        MilyenHosszuFilm();
+    }
+
+    private static void MilyenHosszuFilm()
+    {
+        Console.WriteLine("Hány órás filmet szeretnél nézni? (1-3)");
+        int ora = Convert.ToInt32(Console.ReadLine());
+        while (ora<1 || ora>3)
+        {
+            Console.WriteLine("Hány órás filmet szeretnél nézni? (1-3)");
+            ora = Convert.ToInt32(Console.ReadLine());
+        }
+
+        for (int i = 0; i < filmLista.Count; i++)
+        {
+            switch (ora)
+            {
+                case 1:
+                    if (30<=filmLista[i].Hossz && filmLista[i].Hossz <= 90)
+                    {
+                        Console.WriteLine($"\t{filmLista[i].Cim} - {filmLista[i].Hossz} perc");
+                    }
+                    break;
+                case 2:
+                    if (91 <= filmLista[i].Hossz && filmLista[i].Hossz <= 150)
+                    {
+                        Console.WriteLine($"\t{filmLista[i].Cim} - {filmLista[i].Hossz} perc");
+                    }
+                    break;
+                case 3:
+                    if (151 <= filmLista[i].Hossz && filmLista[i].Hossz <= 250)
+                    {
+                        Console.WriteLine($"\t{filmLista[i].Cim} - {filmLista[i].Hossz} perc");
+                    }
+                    break;
+            }
+        }
     }
 
     private static string KategoriaValasztas()
@@ -241,7 +280,7 @@ internal class Program
         using (StreamWriter sw = new StreamWriter(fajlNev, append: true))
         {
             if (!endsWithNewline)
-                sw.WriteLine(); // ensures newline before appending
+                sw.WriteLine();
 
             sw.WriteLine($"{vevoNev},{kivalasztottFilm},{kivalasztottVetites},{valasztottSor},{valasztottSzek}");
 
