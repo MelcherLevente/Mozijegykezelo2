@@ -13,7 +13,7 @@
 
   <ItemGroup>
     <Reference Include="FileIO">
-      <HintPath>..\FileIO-main\FileIO\bin\Debug\net8.0\FileIO.dll</HintPath>
+      <HintPath>..\..\..\Desktop\mindenes\FileIO.dll</HintPath>
     </Reference>
   </ItemGroup>
 

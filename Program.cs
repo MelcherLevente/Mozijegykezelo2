@@ -19,9 +19,12 @@ internal class Program
     
     static void Main(string[] args)
     {
-        //Console.ForegroundColor = ConsoleColor.Yellow;
-        //Console.BackgroundColor = ConsoleColor.DarkMagenta;
-        //Console.Clear();
+        Console.ForegroundColor = ConsoleColor.White;
+        Console.BackgroundColor = ConsoleColor.DarkGreen;
+        Console.Clear();
+        Console.WriteLine("   xxxxxxx         xx xxx                                        \r\n  xxxxxxxxx        xxxxxxxx                                      \r\n    xxx  xx        xxx xxx                                       \r\n    xxxx xxxxxx   xx    xxx                                      \r\n  xxxxxxx   xxx  xxx    xxxx                                  xxx\r\n  xxxxxx     xxxxxxx    xxxxx      xxx                        xxx\r\n xxxxxx       xxx       xxx    xxxxx  xxxxx  xxxxxxxx            \r\n  xxx                   xxx   xxx        xx  xxxxxxxxxxx      xx \r\n xxxx                   xx   xxx xx  x  xx         xxxx      xxxx\r\n  xxxx                  xx   xx         xx        xxx        xxxx\r\n  xxx                   xxx  xx  x  x   xx      xxxx         xxxx\r\n xxx                    xx   x   xxx  xxx     xxx            xxxx\r\nxxxx                    xx   xx      xx      xxxx            xxxx\r\n xxx                    xxx  xxxxxxxxxx     xxxxxxxxxxxxx     xx ");
+        Console.WriteLine("\n");
+
         JegyBeolvasas(ref jegyAdatok);
         JegyFeltoltes(jegyAdatok);
         //Kiiras(jegyek);
@@ -35,10 +38,64 @@ internal class Program
         Jegyvasarlas(jegyek);
 
 
-        //Top5(filmAdatok);
+        Top5();
+        LegTobbFilm();
+
+
 
 
         MilyenHosszuFilm();
+
+        
+
+       
+
+
+
+}
+
+private static void LegTobbFilm()
+    {
+        Console.WriteLine("\n--- Rendező, aki a legtöbb filmet rendezte ---");
+
+        var top = filmLista
+            .Where(f => !string.IsNullOrWhiteSpace(f.Rendezo))
+            .GroupBy(f => f.Rendezo)
+            .Select(g => new { Rendezo = g.Key, FilmDb = g.Count() })
+            .OrderByDescending(x => x.FilmDb)
+            .FirstOrDefault();
+
+        if (top == null)
+        {
+            Console.WriteLine("Nincs erről a rendezőről adat az adatbázisban.");
+            return;
+        }
+
+        Console.WriteLine($"{top.Rendezo} - {top.FilmDb} db film");
+
+        
+        Console.WriteLine("Filmek tőle:");
+        foreach (var f in filmLista.Where(f => f.Rendezo == top.Rendezo))
+            Console.WriteLine($"\t- {f.Cim} ({f.MegjelenesEve})");
+    }
+
+    private static void Top5()
+    {
+        Console.WriteLine("\n--- TOP 5 film (legtöbb eladott jegy) ---");
+
+        var top5 = jegyek
+            .GroupBy(j => j.FilmCim)
+            .Select(g => new { FilmCim = g.Key, JegyekSzama = g.Count() })
+            .OrderByDescending(x => x.JegyekSzama)
+            .Take(5)
+            .ToList();
+
+        int helyezes = 1;
+        foreach (var item in top5)
+        {
+            Console.WriteLine($"{helyezes}. {item.FilmCim} - {item.JegyekSzama} db jegy");
+            helyezes++;
+        }
     }
 
     private static void MilyenHosszuFilm()
@@ -293,17 +350,7 @@ internal class Program
     }
 
 
-    private static void Top5(DataTable filmAdatok)
-    {
-        //Console.WriteLine("Ezek a top 5 filmek:");
-        //foreach(var j in jegyek)
-        //{
-        //    if ()
-        //    {
-
-        //    }
-        //}
-    }
+    
 
     
 
