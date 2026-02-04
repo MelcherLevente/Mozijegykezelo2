@@ -45,8 +45,8 @@ internal class Program
 
 
         MilyenHosszuFilm();
-
-        
+        Elkoszones();
+        Console.ReadKey();
 
        
 
@@ -54,7 +54,17 @@ internal class Program
 
 }
 
-private static void LegTobbFilm()
+    private static void Elkoszones()
+    {
+        string text = "----Köszönjük a figyelmet!----";
+        int windowWidth = Console.WindowWidth;
+        int left = (windowWidth - text.Length) / 2;
+
+        Console.SetCursorPosition(left, Console.CursorTop);
+        Console.WriteLine(text);
+    }
+
+    private static void LegTobbFilm()
     {
         Console.WriteLine("\n--- Rendező, aki a legtöbb filmet rendezte ---");
 
@@ -93,7 +103,7 @@ private static void LegTobbFilm()
         int helyezes = 1;
         foreach (var item in top5)
         {
-            Console.WriteLine($"{helyezes}. {item.FilmCim} - {item.JegyekSzama} db jegy");
+            Console.WriteLine($"{helyezes}.\t {item.FilmCim} - {item.JegyekSzama} db jegy");
             helyezes++;
         }
     }
@@ -261,7 +271,8 @@ private static void LegTobbFilm()
         List<int> valaszthatoSzekek = new List<int>();
         string valasztottSor = "";
         int valasztottSzek = 0;
-        Console.WriteLine("Válaszd ki a széked:");
+        Console.WriteLine("Válaszd ki a szé" +
+            "ked:");
         foreach (var j in jegyek)
         {
             if (j.FilmCim == kivalasztottFilm && j.VetitesIdopont == kivalasztottVetites)
@@ -282,7 +293,7 @@ private static void LegTobbFilm()
             }
         }
 
-        Console.WriteLine("Választható székek:");
+        
 
         foreach (var szek in szekek)
         {
@@ -339,7 +350,7 @@ private static void LegTobbFilm()
             if (!endsWithNewline)
                 sw.WriteLine();
 
-            sw.WriteLine($"{vevoNev},{kivalasztottFilm},{kivalasztottVetites},{valasztottSor},{valasztottSzek}");
+            sw.WriteLine($"{vevoNev};{kivalasztottFilm};{kivalasztottVetites};{valasztottSor};{valasztottSzek}");
 
         }
 
@@ -386,7 +397,7 @@ private static void LegTobbFilm()
 
     private static void JegyBeolvasas(ref List<List<string>> jegyAdatok)
     {
-        jegyAdatok = reader.FileRead("Jegyek.csv", 5, ',', true);
+        jegyAdatok = reader.FileRead("Jegyek.csv", 5, ';', true);
     }
     private static void JegyFeltoltes(List<List<string>> jegyAdatok)
     {
